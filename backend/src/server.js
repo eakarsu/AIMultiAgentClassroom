@@ -88,6 +88,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'AI Multi-Agent Classroom', timestamp: new Date().toISOString() });
 });
 
+// === Custom Views (4 endpoints) — MUST be mounted BEFORE the 404 handler ===
+try {
+  app.use('/api/custom-views', require('./routes/customViews'));
+} catch (e) {
+  console.error('custom-views mount fail:', e.message);
+}
+
 // 404
 app.use((req, res) => {
   res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });

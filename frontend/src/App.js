@@ -9,6 +9,7 @@ import LearningPath from './pages/LearningPath';
 import Progress from './pages/Progress';
 import AITools from './pages/AITools';
 import TeacherDashboard from './pages/TeacherDashboard';
+import CustomViewsPage from './pages/CustomViewsPage';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -32,6 +33,7 @@ const AppRoutes = () => {
       <Route path="/progress" element={<PrivateRoute><Progress /></PrivateRoute>} />
       <Route path="/ai-tools" element={<PrivateRoute><AITools /></PrivateRoute>} />
       <Route path="/teacher" element={<PrivateRoute><TeacherDashboard /></PrivateRoute>} />
+      <Route path="/custom-views" element={<PrivateRoute><CustomViewsPage /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
