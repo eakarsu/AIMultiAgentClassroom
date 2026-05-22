@@ -95,6 +95,7 @@ export default function Dashboard() {
         <div style={s.navLinks}>
           <Link to="/progress" style={s.navLink}>Progress</Link>
           <Link to="/learning-path" style={s.navLink}>Learning Path</Link>
+          <Link to="/custom-views" style={s.navLink} data-testid="nav-custom-views">Classroom Views</Link>
           <span style={{ color: '#cbd5e0' }}>|</span>
           <span style={{ fontSize: 14, color: '#4a5568' }}>{user?.email}</span>
           <button style={s.logoutBtn} onClick={logout}>Sign Out</button>

@@ -10,6 +10,12 @@ import Progress from './pages/Progress';
 import AITools from './pages/AITools';
 import TeacherDashboard from './pages/TeacherDashboard';
 import CustomViewsPage from './pages/CustomViewsPage';
+import AccommodationPlanner from './pages/AccommodationPlanner';
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -25,6 +31,10 @@ const AppRoutes = () => {
   const { user } = useAuth();
   return (
     <Routes>
+        <Route path="/insights/timeline" element={<TimelineView />} />
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/session/:id" element={<PrivateRoute><ClassroomSession /></PrivateRoute>} />
@@ -34,6 +44,7 @@ const AppRoutes = () => {
       <Route path="/ai-tools" element={<PrivateRoute><AITools /></PrivateRoute>} />
       <Route path="/teacher" element={<PrivateRoute><TeacherDashboard /></PrivateRoute>} />
       <Route path="/custom-views" element={<PrivateRoute><CustomViewsPage /></PrivateRoute>} />
+      <Route path="/accommodation-planner" element={<PrivateRoute><AccommodationPlanner /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

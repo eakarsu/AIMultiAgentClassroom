@@ -82,6 +82,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classroom', authenticateToken, classroomRoutes);
 app.use('/api/ai', authenticateToken, aiRoutes);
 app.use('/api/teacher', authenticateToken, teacherRoutes);
+app.use('/api/accommodation-planner', authenticateToken, require('./routes/accommodationPlanner'));
 
 // Health check
 app.get('/health', (req, res) => {
