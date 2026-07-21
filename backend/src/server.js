@@ -5,10 +5,11 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
 const { pool, initDB } = require('./db');
+const { jwtSecret } = require('./config/security');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const JWT_SECRET = process.env.JWT_SECRET || 'classroom-secret';
+const JWT_SECRET = jwtSecret();
 
 // Security middleware
 app.use(helmet({
@@ -83,6 +84,12 @@ app.use('/api/classroom', authenticateToken, classroomRoutes);
 app.use('/api/ai', authenticateToken, aiRoutes);
 app.use('/api/teacher', authenticateToken, teacherRoutes);
 app.use('/api/accommodation-planner', authenticateToken, require('./routes/accommodationPlanner'));
+app.use('/api/classroom-workflow', authenticateToken, require('./routes/classroomWorkflow'));
+
+app.use(/^\/api\/(?:gap-|multi-modal-tutor|misconception-realtime|socratic-dialogue|path-personalizer|voice-learning)/, (req,res,next) => {
+  if (process.env.ENABLE_EXPERIMENTAL_ROUTES === 'true') return next();
+  return res.status(501).json({error:'Generated/provider-backed surface is quarantined',required:'ENABLE_EXPERIMENTAL_ROUTES=true plus documented provider configuration'});
+});
 
 // Health check
 app.get('/health', (req, res) => {

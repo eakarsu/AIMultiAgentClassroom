@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { jwtSecret } = require('../config/security');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'classroom-secret';
+const JWT_SECRET = jwtSecret();
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   const { pool } = req.app.locals;
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
@@ -26,7 +27,7 @@ router.post('/register', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     const result = await pool.query(
       'INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNING id, email, role, created_at',
-      [email.toLowerCase().trim(), hashed, role || 'student']
+      [email.toLowerCase().trim(), hashed, 'student']
     );
 
     const user = result.rows[0];
