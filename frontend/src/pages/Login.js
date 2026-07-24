@@ -62,6 +62,15 @@ export default function Login() {
             <label style={s.label}>Password</label>
             <input style={s.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
           </div>
+          <button
+            type="button"
+            onClick={() => { setEmail(process.env.REACT_APP_DEMO_EMAIL || ''); setPassword(process.env.REACT_APP_DEMO_PASSWORD || ''); }}
+            disabled={!process.env.REACT_APP_DEMO_EMAIL || !process.env.REACT_APP_DEMO_PASSWORD}
+            aria-label="Auto Fill Demo Credentials"
+            style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid currentColor', background: 'transparent', cursor: 'pointer' }}
+          >
+            Auto Fill Demo Credentials
+          </button>
           <button style={s.btn} type="submit" disabled={loading}>
             {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
           </button>
