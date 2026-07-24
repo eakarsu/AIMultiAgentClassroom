@@ -1,23 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const https = require('https');
 
 // OpenRouter helper
-const callOpenRouter = (systemPrompt, userPrompt) => {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify({
-      model: process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      max_tokens: 4000,
-      temperature: 0.7,
-    });
-
-    const options = {
-      hostname: 'openrouter.ai',
-      path: '/api/v1/chat/completions',
+const callOpenRouter = async (systemPrompt, userPrompt) => {
+    if (!process.env.OPENROUTER_API_KEY || !process.env.OPENROUTER_MODEL) {
+      throw new Error('OpenRouter provider is not configured');
+    }
+    const baseUrl = (process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/$/, '');
+    const response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,30 +15,21 @@ const callOpenRouter = (systemPrompt, userPrompt) => {
         'HTTP-Referer': process.env.CLIENT_URL || 'http://localhost:3000',
         'X-Title': 'AI Multi-Agent Classroom',
       },
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.choices && parsed.choices[0]) {
-            resolve(parsed.choices[0].message.content);
-          } else if (parsed.error) {
-            reject(new Error(parsed.error.message || 'OpenRouter API error'));
-          } else {
-            reject(new Error('Unexpected API response'));
-          }
-        } catch (e) {
-          reject(e);
-        }
-      });
+      body: JSON.stringify({
+      model: process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: 4000,
+      temperature: 0.7,
+      }),
     });
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+    const parsed = await response.json().catch(() => ({}));
+    if (!response.ok || parsed.error) throw new Error(parsed.error?.message || `OpenRouter HTTP ${response.status}`);
+    const content = parsed.choices?.[0]?.message?.content;
+    if (!content || !String(content).trim()) throw new Error('OpenRouter returned empty content');
+    return content;
 };
 
 const parseJSON = (text) => {
