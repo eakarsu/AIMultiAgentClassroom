@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import FormattedAIReport from '../components/FormattedAIReport';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { API } from '../context/AuthContext';
@@ -129,7 +130,7 @@ export default function ClassroomSession() {
       return (
         <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
           <div style={s.agentLabel}>You</div>
-          <div style={s.msgBubble('student')}>{typeof content === 'string' ? content : JSON.stringify(content)}</div>
+          <div style={s.msgBubble('student')}>{typeof content === 'string' ? content : <FormattedAIReport response={content} title="Student message" />}</div>
         </div>
       );
     }
@@ -138,11 +139,7 @@ export default function ClassroomSession() {
       return (
         <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <div style={s.agentLabel}>🤖 AI Tutor</div>
-          <div style={s.msgBubble('tutor')}>
-            <div style={{ marginBottom: content.example ? 10 : 0 }}>{content.explanation}</div>
-            {content.example && <div style={{ fontSize: 13, padding: '8px 12px', background: '#ebf8ff', borderRadius: 6, color: '#2c5282', borderLeft: '3px solid #667eea' }}>Example: {content.example}</div>}
-            {content.follow_up_question && <div style={s.followUp}>💭 {content.follow_up_question}</div>}
-          </div>
+          <div style={s.msgBubble('tutor')}><FormattedAIReport response={content} title="Tutor response" /></div>
         </div>
       );
     }
@@ -150,7 +147,7 @@ export default function ClassroomSession() {
     return (
       <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         <div style={s.agentLabel}>{role}</div>
-        <div style={s.msgBubble('tutor')}>{typeof content === 'string' ? content : JSON.stringify(content)}</div>
+        <div style={s.msgBubble('tutor')}>{typeof content === 'string' ? content : <FormattedAIReport response={content} title="AI response" />}</div>
       </div>
     );
   };
@@ -185,6 +182,13 @@ export default function ClassroomSession() {
             <div ref={messagesEnd} />
           </div>
 
+          <div aria-label="Tutor prompt examples" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: 8 }}>
+            {[
+              `Explain the central idea in ${session?.topic || 'this topic'} with a simple example.`,
+              `Give me a practice question about ${session?.topic || 'this topic'} and explain the answer after I try.`,
+              `Compare two common approaches to ${session?.topic || 'this topic'} and when each is useful.`,
+            ].map((sample, index) => <button key={index} type="button" disabled={loading} onClick={() => setMessage(sample)}>Fill example {index + 1}</button>)}
+          </div>
           <form onSubmit={sendMessage} style={s.inputRow}>
             <textarea
               style={s.textInput}

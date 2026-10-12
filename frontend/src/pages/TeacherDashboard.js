@@ -1,3 +1,6 @@
+import NativeAIControls from "../components/NativeAIControls";
+import useNativeAIRequest from "../components/useNativeAIRequest";
+import FormattedAIReport from "../components/FormattedAIReport";
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -29,6 +32,8 @@ const s = {
 function authHeader(token) { return { Authorization: `Bearer ${token}` }; }
 
 export default function TeacherDashboard() {
+  const nativeAIRequest = useNativeAIRequest();
+
   const { user, token, logout } = useAuth();
   const [counts, setCounts] = useState({});
   const [modules, setModules] = useState([]);
@@ -87,11 +92,11 @@ export default function TeacherDashboard() {
     setParentResult(null);
     setError('');
     try {
-      const res = await axios.post(`${API}/api/ai/parent-communication`, {
+      const res = await nativeAIRequest.run((signal) => axios.post(`${API}/api/ai/parent-communication`, {
         studentId: Number(parentForm.studentId),
         period: parentForm.period,
         tone: parentForm.tone,
-      }, headers);
+      }, { ...(headers), ...({ signal }) }));
       setParentResult(res.data);
     } catch (e) {
       const status = e.response?.status;
@@ -107,10 +112,10 @@ export default function TeacherDashboard() {
     setGradeResult(null);
     setError('');
     try {
-      const res = await axios.post(`${API}/api/ai/grade-summary`, {
+      const res = await nativeAIRequest.run((signal) => axios.post(`${API}/api/ai/grade-summary`, {
         studentId: Number(gradeForm.studentId),
         period: gradeForm.period,
-      }, headers);
+      }, { ...(headers), ...({ signal }) }));
       setGradeResult(res.data);
     } catch (e) {
       const status = e.response?.status;
@@ -174,26 +179,26 @@ export default function TeacherDashboard() {
           </ul>
         </div>
 
-        <div style={s.card}>
+        <NativeAIControls busy={nativeAIRequest.busy} onCancel={nativeAIRequest.cancel} context="Multi Agent Classroom"><div style={s.card}>
           <div style={s.cardH}>AI: Parent Communication</div>
           <div style={s.row}>
-            <input style={s.input} placeholder="Student ID" value={parentForm.studentId} onChange={(e) => setParentForm({ ...parentForm, studentId: e.target.value })} />
-            <input style={s.input} placeholder="Period" value={parentForm.period} onChange={(e) => setParentForm({ ...parentForm, period: e.target.value })} />
-            <input style={s.input} placeholder="Tone" value={parentForm.tone} onChange={(e) => setParentForm({ ...parentForm, tone: e.target.value })} />
+            <input data-ai-field="studentId" style={s.input} placeholder="Student ID" value={parentForm.studentId} onChange={(e) => setParentForm({ ...parentForm, studentId: e.target.value })} />
+            <input data-ai-field="period" style={s.input} placeholder="Period" value={parentForm.period} onChange={(e) => setParentForm({ ...parentForm, period: e.target.value })} />
+            <input data-ai-field="tone" style={s.input} placeholder="Tone" value={parentForm.tone} onChange={(e) => setParentForm({ ...parentForm, tone: e.target.value })} />
             <button style={s.btn} disabled={loading} onClick={callParent}>{loading ? '...' : 'Generate'}</button>
           </div>
-          {parentResult && <pre style={s.pre}>{JSON.stringify(parentResult.message || parentResult, null, 2)}</pre>}
-        </div>
+          {parentResult && <FormattedAIReport response={parentResult.message || parentResult} />}
+        </div></NativeAIControls>
 
-        <div style={s.card}>
+        <NativeAIControls busy={nativeAIRequest.busy} onCancel={nativeAIRequest.cancel} context="Multi Agent Classroom"><div style={s.card}>
           <div style={s.cardH}>AI: Grade Report Summary</div>
           <div style={s.row}>
-            <input style={s.input} placeholder="Student ID" value={gradeForm.studentId} onChange={(e) => setGradeForm({ ...gradeForm, studentId: e.target.value })} />
-            <input style={s.input} placeholder="Period" value={gradeForm.period} onChange={(e) => setGradeForm({ ...gradeForm, period: e.target.value })} />
+            <input data-ai-field="studentId" style={s.input} placeholder="Student ID" value={gradeForm.studentId} onChange={(e) => setGradeForm({ ...gradeForm, studentId: e.target.value })} />
+            <input data-ai-field="period" style={s.input} placeholder="Period" value={gradeForm.period} onChange={(e) => setGradeForm({ ...gradeForm, period: e.target.value })} />
             <button style={s.btn} disabled={loading} onClick={callGradeSummary}>{loading ? '...' : 'Generate'}</button>
           </div>
-          {gradeResult && <pre style={s.pre}>{JSON.stringify(gradeResult.summary || gradeResult, null, 2)}</pre>}
-        </div>
+          {gradeResult && <FormattedAIReport response={gradeResult.summary || gradeResult} />}
+        </div></NativeAIControls>
       </div>
     </div>
   );

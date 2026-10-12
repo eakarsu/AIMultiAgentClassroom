@@ -1,3 +1,4 @@
+import AIReportLibrary from "./components/AIReportLibrary";
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -30,7 +31,7 @@ const styles = {
 const AppRoutes = () => {
   const { user } = useAuth();
   return (
-    <Routes>
+    <><AIReportLibrary floating /><Routes>
         <Route path="/insights/timeline" element={<TimelineView />} />
         <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
         <Route path="/codex/operations" element={<CodexOperationsFeature />} />
@@ -46,7 +47,7 @@ const AppRoutes = () => {
       <Route path="/custom-views" element={<PrivateRoute><CustomViewsPage /></PrivateRoute>} />
       <Route path="/accommodation-planner" element={<PrivateRoute><AccommodationPlanner /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    </Routes></>
   );
 };
 

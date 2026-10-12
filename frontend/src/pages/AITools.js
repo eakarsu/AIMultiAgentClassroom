@@ -1,3 +1,4 @@
+import FormattedAIReport from "../components/FormattedAIReport";
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -71,6 +72,7 @@ export default function AITools() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [presetNotice, setPresetNotice] = useState('');
 
   const tool = TOOLS.find(t => t.key === activeKey);
 
@@ -123,7 +125,7 @@ export default function AITools() {
             <div
               key={t.key}
               style={s.toolCard(activeKey === t.key)}
-              onClick={() => { setActiveKey(t.key); setInputs({}); setResult(null); setError(''); }}
+              onClick={() => { setActiveKey(t.key); setInputs({}); setResult(null); setError(''); setPresetNotice(''); }}
             >
               <div style={{ fontSize: 24 }}>{t.icon}</div>
               <div style={s.toolTitle}>{t.label}</div>
@@ -133,6 +135,15 @@ export default function AITools() {
         </div>
 
         <form style={s.form} onSubmit={submit}>
+          <div aria-label="AI tool examples" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            {['Quick review', 'Focused practice', 'Detailed analysis'].map((label, index) => <button key={label} type="button" disabled={loading} onClick={() => {
+              setInputs((current) => tool.key === 'misconception-detection'
+                ? { ...current, messageLimit: [10, 20, 30][index] }
+                : { ...current, topic: ['Fractions', 'Reading comprehension', 'Algebra'][index], targetDifficulty: ['easier', 'same', 'harder'][index] });
+              setPresetNotice(`Example fields filled. ${tool.key === 'misconception-detection' ? 'Select a real session ID' : 'Select a real student ID'} before running.`);
+            }}>Fill: {label}</button>)}
+          </div>
+          {presetNotice && <p role="status">{presetNotice}</p>}
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: '#1a202c' }}>{tool.icon} {tool.label}</h2>
           <p style={{ color: '#718096', fontSize: 14, marginBottom: 16 }}>{tool.description}</p>
 
@@ -166,14 +177,7 @@ export default function AITools() {
 
           {error && <div style={s.error}>{error}</div>}
 
-          {result && (
-            <div style={s.result}>
-              <div style={s.resultTitle}>Result</div>
-              <pre style={s.pre}>
-                {typeof result === 'string' ? result : JSON.stringify(result, null, 2)}
-              </pre>
-            </div>
-          )}
+          {result !== null && <FormattedAIReport response={result} title={tool.label} />}
         </form>
       </main>
     </div>

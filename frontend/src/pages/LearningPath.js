@@ -76,6 +76,13 @@ export default function LearningPath() {
 
         <div style={s.form}>
           {error && <div style={s.error}>{error}</div>}
+          <div aria-label="Learning path examples" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {[
+              ['Python programming fundamentals', 'beginner'],
+              ['Conversational Spanish for travel', 'intermediate'],
+              ['Portrait photography and lighting', 'advanced'],
+            ].map(([sampleTopic, level]) => <button key={sampleTopic} type="button" disabled={loading} onClick={() => { setTopic(sampleTopic); setCurrentLevel(level); }}>Fill: {sampleTopic}</button>)}
+          </div>
           <form onSubmit={generate} style={s.formRow}>
             <input
               style={s.input}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import FormattedAIReport from '../components/FormattedAIReport';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
@@ -20,7 +21,7 @@ export default function AccommodationPlanner() {
       <h1>IEP Accommodation Planner</h1>
       <p>Generate classroom-ready supports for learner needs and lesson context.</p>
       <button onClick={plan}>Generate plan</button>
-      {result && <pre style={{ marginTop: 20, background: '#f5f5f5', padding: 16 }}>{JSON.stringify(result, null, 2)}</pre>}
+      {result !== null && <FormattedAIReport response={result} title="Accommodation plan" />}
     </div>
   );
 }

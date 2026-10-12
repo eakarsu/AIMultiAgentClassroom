@@ -129,6 +129,13 @@ export default function Dashboard() {
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Start a New Session</h2>
           <p style={{ fontSize: 14, opacity: 0.9 }}>Enter any topic and your AI tutor team will teach you interactively</p>
           {error && <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: 8, padding: '8px 12px', marginTop: 12, fontSize: 13 }}>{error}</div>}
+          <div aria-label="Session examples" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '12px 0' }}>
+            {[
+              ['Python functions', 'Computer science', 'beginner'],
+              ['The causes of World War I', 'History', 'intermediate'],
+              ['Photosynthesis and energy transfer', 'Biology', 'advanced'],
+            ].map(([sampleTopic, sampleSubject, sampleDifficulty]) => <button key={sampleTopic} type="button" disabled={creating} onClick={() => { setTopic(sampleTopic); setSubject(sampleSubject); setDifficulty(sampleDifficulty); }}>Fill: {sampleTopic}</button>)}
+          </div>
           <form onSubmit={createSession} style={s.form}>
             <input style={s.input} value={topic} onChange={e => setTopic(e.target.value)} placeholder="Topic (e.g., Quantum Computing, World War I, Python decorators)" required />
             <input style={{ ...s.input, flex: '0 1 160px' }} value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject (optional)" />

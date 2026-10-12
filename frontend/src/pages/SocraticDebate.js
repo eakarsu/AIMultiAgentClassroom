@@ -73,6 +73,14 @@ export default function SocraticDebate() {
 
         <div style={s.form}>
           {error && <div style={s.error}>{error}</div>}
+          <div aria-label="Debate examples" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {[
+              'Hands-on practice should come before a lecture.',
+              'Group projects help students learn more than individual projects.',
+              'Schools should offer more choice in how students demonstrate mastery.',
+            ].map((sample) => <button key={sample} type="button" disabled={loading} onClick={() => setPosition(sample)}>Fill: {sample}</button>)}
+          </div>
+          {!session && <p style={{ fontSize: 13 }}>A real classroom session is required before starting a debate.</p>}
           <form onSubmit={runDebate} style={s.inputRow}>
             <input
               style={s.input}
