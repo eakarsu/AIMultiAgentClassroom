@@ -43,6 +43,7 @@ const gradeLabel = (pct) => pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' 
 
 export default function Progress() {
   const [data, setData] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export default function Progress() {
               data?.progress?.map((p, i) => {
                 const pct = p.mastery_score || 0;
                 return (
-                  <div key={i} style={s.card}>
+                  <div key={i} style={{ ...s.card, cursor: 'pointer' }} onClick={() => setSelectedItem(p)}>
                     <div style={s.topicRow}>
                       <div style={s.topicName}>{p.topic}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -124,6 +125,23 @@ export default function Progress() {
           </>
         )}
       </main>
+      {selectedItem && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setSelectedItem(null)}>
+          <div role="dialog" aria-modal="true" style={{ background: '#fff', borderRadius: 12, padding: 24, width: '90%', maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ marginTop: 0, marginBottom: 16 }}>{selectedItem.topic}</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              {Object.entries(selectedItem).map(([k, v]) => (
+                <div key={k}><div style={{ fontSize: 11, color: '#718096', textTransform: 'uppercase' }}>{k.replace(/_/g, ' ')}</div><div style={{ fontSize: 14 }}>{String(v ?? '—')}</div></div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button type="button" style={{ padding: '8px 16px', background: '#667eea', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }} onClick={() => setSelectedItem(null)}>Edit</button>
+              <button type="button" style={{ padding: '8px 16px', background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }} onClick={() => setSelectedItem(null)}>Delete</button>
+              <button type="button" style={{ padding: '8px 16px', background: '#edf2f7', color: '#2d3748', border: 'none', borderRadius: 8, cursor: 'pointer' }} onClick={() => setSelectedItem(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ const { pool, initDB } = require('./db');
 const { jwtSecret } = require('./config/security');
 
 const app = express();
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = jwtSecret();
 
@@ -83,6 +84,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classroom', authenticateToken, classroomRoutes);
 app.use('/api/ai', authenticateToken, aiRoutes);
 app.use('/api/teacher', authenticateToken, teacherRoutes);
+app.use('/api/tasks', authenticateToken, require('./routes/featureTasks').createFeatureTasksRouter({ auth: (req,res,next)=>next() }));
 app.use('/api/accommodation-planner', authenticateToken, require('./routes/accommodationPlanner'));
 app.use('/api/classroom-workflow', authenticateToken, require('./routes/classroomWorkflow'));
 

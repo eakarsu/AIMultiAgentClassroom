@@ -37,6 +37,7 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null);
   const [progress, setProgress] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -159,7 +160,7 @@ export default function Dashboard() {
             <div style={s.empty}>No sessions yet. Start your first learning session above!</div>
           ) : (
             sessions.map(session => (
-              <div key={session.id} style={s.sessionCard}>
+              <div key={session.id} style={{ ...s.sessionCard, cursor: 'pointer' }} onClick={() => setSelectedSession(session)}>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 16, color: '#1a202c', marginBottom: 6 }}>{session.topic}</div>
                   <div style={{ fontSize: 13, color: '#718096', marginBottom: 8 }}>
@@ -195,6 +196,26 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+      {selectedSession && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setSelectedSession(null)}>
+          <div role="dialog" aria-modal="true" style={{ background: '#fff', borderRadius: 12, padding: 24, width: '90%', maxWidth: 560, boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ marginTop: 0, marginBottom: 16, color: '#1a202c' }}>{selectedSession.topic}</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              {Object.entries(selectedSession).filter(([k]) => k !== 'id').map(([k, v]) => (
+                <div key={k}>
+                  <div style={{ fontSize: 11, color: '#718096', textTransform: 'uppercase' }}>{k.replace(/_/g, ' ')}</div>
+                  <div style={{ fontSize: 14, color: '#1a202c', fontWeight: 500 }}>{String(v ?? '—')}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button type="button" style={s.btn('#667eea')} onClick={() => { const id = selectedSession.id; setSelectedSession(null); navigate(`/session/${id}`); }}>Edit</button>
+              <button type="button" style={s.btn('#e53e3e')} onClick={() => { setSessions(prev => prev.filter(x => x.id !== selectedSession.id)); setSelectedSession(null); }}>Delete</button>
+              <button type="button" style={{ ...s.logoutBtn }} onClick={() => setSelectedSession(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
